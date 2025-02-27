@@ -542,21 +542,44 @@ function updateLeaderboard() {
         leaderboardDisplay.style.display = leaderboardDisplay.style.display === "block" ? "none" : "block";
       }
 
-      function drawShip(x, y, scale) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(-ship.angle);
-        ctx.scale(scale, scale);
-        ctx.beginPath();
-        ctx.moveTo(ship.size, 0);
-        ctx.lineTo(-ship.size / 2, ship.size / 2);
-        ctx.lineTo(-ship.size / 2, -ship.size / 2);
-        ctx.closePath();
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.restore();
-      }
+function drawShip(x, y, scale) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-ship.angle);
+    ctx.scale(scale, scale);
+    ctx.beginPath();
+
+    // Ship body
+    ctx.moveTo(ship.size, 0);
+    ctx.lineTo(-ship.size / 2, ship.size / 2);
+    ctx.lineTo(-ship.size / 2, -ship.size / 2);
+    ctx.closePath();
+
+    // Legs
+    let legOffsetX = -ship.size / 2;
+    let legOffsetY = ship.size / 2;
+    let legLength = ship.size / 7; // Legs are 1/8th their original size
+    let footLength = ship.size / 6; // Foot size
+
+    // Bottom-right leg
+    let rightLegX = legOffsetX - legLength;
+    let rightLegY = legOffsetY + legLength;
+    ctx.moveTo(legOffsetX, legOffsetY);
+    ctx.lineTo(rightLegX, rightLegY);
+    ctx.lineTo(rightLegX - footLength, rightLegY);
+
+    // Top-left leg
+    let leftLegX = legOffsetX - legLength;
+    let leftLegY = -legOffsetY - legLength;
+    ctx.moveTo(legOffsetX, -legOffsetY);
+    ctx.lineTo(leftLegX, leftLegY);
+    ctx.lineTo(leftLegX - footLength, leftLegY);
+
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+}
 
       function backToMapSelection() {
         gameState = 'mapSelection';
