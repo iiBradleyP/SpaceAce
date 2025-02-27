@@ -292,6 +292,32 @@
         initStars();
         gameLoop();
       });
+	  
+function drawControls() {
+    const controlsWidth = 150;
+    const controlsHeight = 80;
+    const padding = 10;
+    
+    // Position at bottom right
+    const controlsX = canvas.width - controlsWidth - padding;
+    const controlsY = canvas.height - controlsHeight - padding;
+
+    ctx.save();
+    
+    // Draw semi-transparent background
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(controlsX, controlsY, controlsWidth, controlsHeight);
+    
+    // Draw text
+    ctx.fillStyle = "#AFAFFF"; // Light blue text color
+    ctx.font = "16px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("CTRL - Thrust", controlsX + 10, controlsY + 20);
+    ctx.fillText("← → - Rotate", controlsX + 10, controlsY + 40);
+    
+    ctx.restore();
+}
+
 
       function initStars() {
         for (let i = 0; i < maxStars; i++) {
@@ -478,11 +504,11 @@ function updateTimer() {
     const miniMapHeight = 100;
     const timerWidth = 200; // Width of the timer box
     const timerHeight = 40; // Height of the timer box
-    const padding = 10; // Padding around mini-map and timer
+    const padding = 10; // Padding around elements
 
-    // Position timer to the right of mini-map
-    const timerX = miniMapWidth + padding * 2 + 10; // Right of mini-map with padding
-    const timerY = padding; // Top of screen, aligned with mini-map
+    // Position timer on the far left
+    const timerX = padding; // Align to the far left with padding
+    const timerY = padding; // Keep it at the top
 
     // Count balls left (false means not collected)
     const ballsLeft = balls.filter(ball => !ball[2]).length;
@@ -493,25 +519,26 @@ function updateTimer() {
     ctx.fillStyle = "#1A0D2B"; // Dark background (matches the image)
     ctx.fillRect(timerX, timerY, timerWidth, timerHeight);
 
-    ctx.font = "24px 'Digital-7', Arial"; // Use a digital-style font (you may need to load 'Digital-7' or use a similar monospace font)
+    ctx.font = "24px 'Digital-7', Arial"; // Use a digital-style font
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Best time (left, pink) - moved left and spaced out
+    // Best time (left, pink) - spaced out evenly
     ctx.fillStyle = "#FF69B4"; // Pink for best time
-    ctx.fillText(`${bestTime === Infinity ? "0.0" : bestTime.toFixed(1)}`, timerX + 40, timerY + timerHeight / 2);
+    ctx.fillText(`${bestTime === Infinity ? "0.0" : bestTime.toFixed(1)}`, timerX + 110, timerY + timerHeight / 2);
 
-    // Current time (middle, pink) - spaced out further
+    // Current time (middle, pink)
     ctx.fillStyle = "#FF69B4"; // Pink for current time
-    ctx.fillText(`${elapsedTime.toFixed(1)}`, timerX + 120, timerY + timerHeight / 2);
+    ctx.fillText(`${elapsedTime.toFixed(1)}`, timerX + 40, timerY + timerHeight / 2);
 
-    // Balls left (right, green) - moved further right within the box
+    // Balls left (right, green)
     ctx.fillStyle = "#00FF00"; // Green for balls left
     ctx.fillText(`${ballsLeft}`, timerX + 180, timerY + timerHeight / 2);
 
     ctx.restore();
   }
 }
+
 
 function updateLeaderboard() {
   if (!leaderboardDisplay) {
@@ -664,25 +691,31 @@ function drawShip(x, y, scale) {
         ctx.restore();
       }
 
-      function drawMiniMap() {
-        const miniMapWidth = 150;
-        const miniMapHeight = 100;
-        const miniMapScale = miniMapWidth / mapWidth;
-        ctx.save();
-        ctx.translate(10, 10); // Mini-map at top-left with 10px padding
-        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-        ctx.fillRect(0, 0, miniMapWidth, miniMapHeight);
-        drawMaze(0, 0, miniMapScale);
-        drawBalls(0, 0, miniMapScale);
-        if (ship.visible && !explosion.active) {
-          drawShip(ship.x * miniMapScale, ship.y * miniMapScale, miniMapScale);
-          drawThrust(ship.x * miniMapScale, ship.y * miniMapScale, miniMapScale);
-        }
-        if (explosion.active) {
-          drawExplosion(explosion.x * miniMapScale, explosion.y * miniMapScale, miniMapScale);
-        }
-        ctx.restore();
-      }
+function drawMiniMap() {
+    const miniMapWidth = 150 * 1.2; // 20% bigger
+    const miniMapHeight = 100 * 1.2; // 20% bigger
+    const miniMapScale = miniMapWidth / mapWidth;
+    
+    ctx.save();
+    ctx.translate(canvas.width - miniMapWidth - 10, 10); // Move to top-right with 10px padding
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(0, 0, miniMapWidth, miniMapHeight);
+    
+    drawMaze(0, 0, miniMapScale);
+    drawBalls(0, 0, miniMapScale);
+    
+    if (ship.visible && !explosion.active) {
+        drawShip(ship.x * miniMapScale, ship.y * miniMapScale, miniMapScale);
+        drawThrust(ship.x * miniMapScale, ship.y * miniMapScale, miniMapScale);
+    }
+    
+    if (explosion.active) {
+        drawExplosion(explosion.x * miniMapScale, explosion.y * miniMapScale, miniMapScale);
+    }
+    
+    ctx.restore();
+}
+
 
       function update(deltaTime) {
         if (gameState !== 'playing' || ship.frozen) {
